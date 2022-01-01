@@ -16,7 +16,7 @@ export class Appointment {
   @Column({ type: 'datetime' })
   date: Date;
 
-  @ManyToOne(() => Doctor, (doctor) => doctor.appointments)
+  @ManyToOne(() => Doctor, (doctor) => doctor.appointments, { eager: true })
   doctor: Doctor;
 
   @ManyToOne(() => Patient, (patient) => patient.appointments)

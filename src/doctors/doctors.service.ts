@@ -28,8 +28,8 @@ export class DoctorsService {
     return await this.doctorRepository.save(doctor);
   }
 
-  findAll() {
-    return `This action returns all doctors`;
+  async findAll() : Promise<Doctor[]> {
+    return await this.doctorRepository.find();
   }
 
   findOne(id: number) {

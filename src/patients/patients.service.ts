@@ -4,7 +4,6 @@ import { UpdatePatientDto } from './dto/update-patient.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Patient } from './entities/patient.entity';
 import { Repository } from 'typeorm';
-
 @Injectable()
 export class PatientsService {
   constructor(
@@ -12,13 +11,16 @@ export class PatientsService {
     private readonly patientRepository: Repository<Patient>,
   ) {}
 
-  async create(createPatientDto: CreatePatientDto) {
+  async create(createPatientDto: CreatePatientDto): Promise<Patient> {
     const patient = new Patient();
     patient.name = createPatientDto.name;
+    patient.cpf = createPatientDto.cpf;
+
+    return await this.patientRepository.save(patient);
   }
 
-  findAll() {
-    return `This action returns all patients`;
+  async findAll(): Promise<Patient[]> {
+    return await this.patientRepository.find();
   }
 
   findOne(id: number) {
