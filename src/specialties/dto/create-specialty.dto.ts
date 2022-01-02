@@ -7,5 +7,5 @@ export class CreateSpecialtyDto {
 }
 
 export class findSpecialtyDto {
-    name: string
+  name: string;
 }

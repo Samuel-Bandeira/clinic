@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { ConsoleLogger, Inject, Injectable } from '@nestjs/common';
 import { CreateAppointmentDto } from './dto/create-appointment.dto';
 import { UpdateAppointmentDto } from './dto/update-appointment.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -17,7 +17,7 @@ export class ApointmentsService {
     @InjectRepository(Patient)
     private readonly patientRepository: Repository<Patient>,
   ) {}
-  
+
   async create(
     createApointmentDto: CreateAppointmentDto,
   ): Promise<Appointment> {
@@ -28,27 +28,54 @@ export class ApointmentsService {
       createApointmentDto.patient,
     );
 
-    const appointment = new Appointment();
-    appointment.date = new Date();
-    appointment.doctor = doctor;
-    appointment.patient = patient;
+    const appointment = this.appointmentRepository.create({
+      date: new Date(),
+      doctor: doctor,
+      patient: patient,
+    });
 
     return this.appointmentRepository.save(appointment);
   }
 
-  findAll() {
-    return `This action returns all apointments`;
+  getDoctorAndPatient(appointmentId: number): Promise<Appointment> {
+    return this.appointmentRepository.findOne(appointmentId, {
+      relations: ['doctor', 'patient'],
+    });
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} apointment`;
+  findAll(): Promise<Appointment[]> {
+    return this.appointmentRepository.find();
   }
 
-  update(id: number, updateApointmentDto: UpdateAppointmentDto) {
-    return `This action updates a #${id} apointment`;
+  findOne(id: number): Promise<Appointment> {
+    return this.appointmentRepository.findOneOrFail(id);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} apointment`;
+  async update(id: number, updateApointmentDto: UpdateAppointmentDto) {
+    const appointment = await this.appointmentRepository.findOneOrFail(id);
+    appointment.date = updateApointmentDto.date;
+
+    if (!updateApointmentDto.doctor) {
+      const doctor = await this.doctorRepository.findOne(
+        updateApointmentDto.doctor,
+      );
+      appointment.doctor = doctor;
+    }
+
+    if (!updateApointmentDto.patient) {
+      const patient = await this.patientRepository.findOne(
+        updateApointmentDto.patient,
+      );
+
+      appointment.patient = patient;
+    }
+
+    console.log(updateApointmentDto.doctor);
+    return this.appointmentRepository.save(appointment);
+  }
+
+  async remove(id: number): Promise<Appointment> {
+    const appointment = await this.appointmentRepository.findOne(id);
+    return this.appointmentRepository.remove(appointment);
   }
 }

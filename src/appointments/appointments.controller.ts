@@ -1,34 +1,56 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  Put,
+} from '@nestjs/common';
 import { ApointmentsService } from './appointments.service';
 import { CreateAppointmentDto } from './dto/create-appointment.dto';
 import { UpdateAppointmentDto } from './dto/update-appointment.dto';
+import { Appointment } from 'src/appointments/entities/appointment.entity';
 
 @Controller('appointments')
 export class ApointmentsController {
   constructor(private readonly apointmentsService: ApointmentsService) {}
 
   @Post()
-  create(@Body() createApointmentDto: CreateAppointmentDto) {
+  create(
+    @Body() createApointmentDto: CreateAppointmentDto,
+  ): Promise<Appointment> {
     return this.apointmentsService.create(createApointmentDto);
   }
 
   @Get()
-  findAll() {
-    return this.apointmentsService.findAll();
+  async findAll(): Promise<Appointment[]> {
+    return await this.apointmentsService.findAll();
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.apointmentsService.findOne(+id);
+  async findOne(@Param('id') id: number): Promise<Appointment> {
+    return await this.apointmentsService.findOne(id);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateApointmentDto: UpdateAppointmentDto) {
-    return this.apointmentsService.update(+id, updateApointmentDto);
+  @Put('/:id')
+  async update(
+    @Param('id') id: number,
+    @Body() updateApointmentDto: UpdateAppointmentDto,
+  ) {
+    return await this.apointmentsService.update(id, updateApointmentDto);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.apointmentsService.remove(+id);
+  }
+
+  @Get('/:appointmentId/doctor/patient')
+  async getDoctorAndPatient(
+    @Param('appointmentId') appointmentId: number 
+  ) {
+    return await this.apointmentsService.getDoctorAndPatient(appointmentId)
   }
 }

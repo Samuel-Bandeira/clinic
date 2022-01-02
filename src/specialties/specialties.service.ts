@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { Doctor } from 'src/doctors/entities/doctor.entity';
 import { Repository } from 'typeorm';
 import { CreateSpecialtyDto } from './dto/create-specialty.dto';
 import { UpdateSpecialtyDto } from './dto/update-specialty.dto';
@@ -8,29 +9,39 @@ import { Specialty } from './entities/specialty.entity';
 @Injectable()
 export class SpecialtiesService {
   constructor(
-    @InjectRepository(Specialty) private repo: Repository<Specialty>,
+    @InjectRepository(Specialty)
+    private specilatyRepository: Repository<Specialty>,
   ) {}
 
-  async create(createSpecialtyDto: CreateSpecialtyDto): Promise<Specialty> {
-    const specialty = new Specialty();
-    specialty.name = createSpecialtyDto.name;
+  create(createSpecialtyDto: CreateSpecialtyDto): Promise<Specialty> {
+    const specialty = this.specilatyRepository.create({
+      name: createSpecialtyDto.name,
+    });
 
-    return this.repo.save(specialty);
+    return this.specilatyRepository.save(specialty);
   }
 
-  findAll() {
-    return `This action returns all specialties`;
+  findAll(): Promise<Specialty[]> {
+    return this.specilatyRepository.find({
+      relations: ['doctors'],
+    });
   }
 
   findOne(id: number) {
-    return `This action returns a #${id} specialty`;
+    return this.specilatyRepository.findOne(id, {
+      relations: ['doctors'],
+    });
   }
 
-  update(id: number, updateSpecialtyDto: UpdateSpecialtyDto) {
-    return `This action updates a #${id} specialty`;
+  async update(id: number, updateSpecialtyDto: UpdateSpecialtyDto) {
+    const specialty = await this.specilatyRepository.findOne(id);
+    specialty.name = updateSpecialtyDto.name;
+
+    return this.specilatyRepository.save(specialty);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} specialty`;
+  async remove(id: number) {
+    const specialty = await this.specilatyRepository.findOne(id);
+    return this.specilatyRepository.remove(specialty);
   }
 }

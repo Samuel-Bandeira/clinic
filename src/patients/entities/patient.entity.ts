@@ -12,8 +12,6 @@ export class Patient {
   @Column()
   cpf: string;
 
-  @OneToMany(() => Appointment, (appointment) => appointment.patient, {
-    eager: true,
-  })
+  @OneToMany(() => Appointment, (appointment) => appointment.patient)
   appointments: Appointment[];
 }

@@ -15,21 +15,20 @@ export class DoctorsService {
   ) {}
 
   async create(createDoctorDto: CreateDoctorDto) {
-    const doctor = new Doctor();
-
     const specialties: Specialty[] = await this.specialtyRepository.findByIds(
       createDoctorDto.specialties,
     );
 
-    doctor.name = createDoctorDto.name;
-    doctor.crm = createDoctorDto.crm;
-    doctor.specialties = specialties;
-
-    return await this.doctorRepository.save(doctor);
+    const doctor = this.doctorRepository.create({
+      name: createDoctorDto.name,
+      crm: createDoctorDto.crm,
+      specialties: specialties,
+    });
+    return this.doctorRepository.save(doctor);
   }
 
-  async findAll() : Promise<Doctor[]> {
-    return await this.doctorRepository.find();
+  findAll(): Promise<Doctor[]> {
+    return this.doctorRepository.find();
   }
 
   findOne(id: number) {

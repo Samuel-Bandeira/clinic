@@ -24,7 +24,7 @@ export class DoctorsController {
   findAll() {
     return this.doctorsService.findAll();
   }
-
+  
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.doctorsService.findOne(+id);
