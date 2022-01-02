@@ -53,16 +53,19 @@ export class ApointmentsService {
 
   async update(id: number, updateApointmentDto: UpdateAppointmentDto) {
     const appointment = await this.appointmentRepository.findOneOrFail(id);
-    appointment.date = updateApointmentDto.date;
 
-    if (!updateApointmentDto.doctor) {
+    if (appointment.date) {
+      appointment.date = updateApointmentDto.date;
+    }
+
+    if (updateApointmentDto.doctor) {
       const doctor = await this.doctorRepository.findOne(
         updateApointmentDto.doctor,
       );
       appointment.doctor = doctor;
     }
 
-    if (!updateApointmentDto.patient) {
+    if (updateApointmentDto.patient) {
       const patient = await this.patientRepository.findOne(
         updateApointmentDto.patient,
       );
@@ -70,7 +73,6 @@ export class ApointmentsService {
       appointment.patient = patient;
     }
 
-    console.log(updateApointmentDto.doctor);
     return this.appointmentRepository.save(appointment);
   }
 

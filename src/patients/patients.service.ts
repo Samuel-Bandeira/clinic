@@ -24,14 +24,26 @@ export class PatientsService {
   }
 
   findOne(id: number) {
-    return `This action returns a #${id} patient`;
+    return this.patientRepository.findOne(id);
   }
 
-  update(id: number, updatePatientDto: UpdatePatientDto) {
-    return `This action updates a #${id} patient`;
+  async update(
+    id: number,
+    updatePatientDto: UpdatePatientDto,
+  ): Promise<Patient> {
+    const patient = await this.patientRepository.findOne(id);
+    if (updatePatientDto.name) {
+      patient.name = updatePatientDto.name;
+    }
+    if (updatePatientDto.cpf) {
+      patient.cpf = updatePatientDto.cpf;
+    }
+
+    return this.patientRepository.save(patient);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} patient`;
+  async remove(id: number): Promise<Patient> {
+    const patient = await this.patientRepository.findOne(id);
+    return this.patientRepository.remove(patient);
   }
 }

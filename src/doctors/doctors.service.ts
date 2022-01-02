@@ -24,6 +24,7 @@ export class DoctorsService {
       crm: createDoctorDto.crm,
       specialties: specialties,
     });
+
     return this.doctorRepository.save(doctor);
   }
 
@@ -31,15 +32,34 @@ export class DoctorsService {
     return this.doctorRepository.find();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} doctor`;
+  findOne(id: number): Promise<Doctor> {
+    return this.doctorRepository.findOne(id);
   }
 
-  update(id: number, updateDoctorDto: UpdateDoctorDto) {
-    return `This action updates a #${id} doctor`;
+  async update(id: number, updateDoctorDto: UpdateDoctorDto): Promise<Doctor> {
+    //name/crm/specialties
+    const doctor = await this.doctorRepository.findOne(id);
+
+    if (updateDoctorDto.crm) {
+      doctor.crm = updateDoctorDto.crm;
+    }
+
+    if (updateDoctorDto.name) {
+      doctor.name = updateDoctorDto.name;
+    }
+
+    if (updateDoctorDto.specialties) {
+      const specialties: Specialty[] = await this.specialtyRepository.findByIds(
+        updateDoctorDto.specialties,
+      );
+      doctor.specialties = specialties;
+    }
+
+    return this.doctorRepository.save(doctor);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} doctor`;
+  async remove(id: number) {
+    const doctor = await this.doctorRepository.findOne(id);
+    return this.doctorRepository.remove(doctor);
   }
 }
